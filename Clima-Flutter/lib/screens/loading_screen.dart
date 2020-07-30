@@ -1,8 +1,9 @@
-import 'dart:convert';
-
-import 'package:clima/services/location.dart';
+import 'package:clima/screens/location_screen.dart';
+import 'package:clima/services/weather.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+const apiKey = '44c4c63a08bd791dc0aa1bc330cc5c38';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -10,47 +11,39 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  void getLocation() async {
-    Location location = Location();
-    await location.getCurrentLocation();
-    print(location.latitude);
-    print(location.longitude);
-  }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    print('init called');
-    getLocation();
+    print('loading_init_called');
+    getLocationData();
   }
 
-  void getData() async {
-    http.Response response = await http.get(
-        'https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=439d4b804bc8187953eb36d2a8c26a02#');
-    if (response.statusCode == 200) {
-      String data = response.body;
-      var decodedData = jsonDecode(data);
-      int id = decodedData['weather'][0]['id'];
-      double temperature = decodedData['main']['temp'];
-      String cityName = decodedData['name'];
-      print(id.toString() + ' ' + temperature.toString() + ' ' + cityName);
-    } else {
-      print(response.statusCode);
-    }
+  void getLocationData() async {
+    print('inside_getLocationData');
+    WeatherModel weatherModel = WeatherModel();
+    var weatherData = await weatherModel.getLocationWeather();
+    print(weatherData);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return LocationScreen(weatherData);
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    getData();
     return Scaffold(
       body: Center(
-        child: RaisedButton(
-          onPressed: () {
-            print('Button Pressed from Build');
-            getLocation();
-          },
-          child: Text('Get Location!!'),
+        child: SpinKitFoldingCube(
+          color: Colors.green,
+          duration: Duration(
+            milliseconds: 1200 /**/,
+          ),
+          size: 100,
         ),
       ),
     );

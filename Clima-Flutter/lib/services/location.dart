@@ -5,10 +5,12 @@ class Location {
   double longitude;
   Future<void> getCurrentLocation() async {
     try {
+      print('getting_location');
       Position position = await Geolocator()
           .getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
       latitude = position.latitude;
       longitude = position.longitude;
+      print('got_Location');
     } catch (e) {
       print(e);
     }
